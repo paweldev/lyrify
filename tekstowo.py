@@ -30,7 +30,8 @@ def fetch_lyrics(u):
 		return "Instrumental"
 
 def download_all_box_przeboje_values(url):
-	#print(url)
+	save_method_name(download_all_box_przeboje_values.__name__)
+
 	u_first = url.replace("[[page]]", "1")
 
 	try:
@@ -58,10 +59,7 @@ def download_all_box_przeboje_values(url):
 	return krotki
 
 def fetch_all_artist(artist, startFrom=0):
-	path = os.path.dirname(os.path.realpath(__file__))
-	with open("%s/.restore_method" % path, "w") as restore_method_handle:
-		restore_method_handle.write("fetch_all_lyrics")
-		restore_method_handle.close()
+	save_method_name(fetch_all_artist.__name__)
 
 	artist = artist.lower().strip()
 	first = (artist[0:1])
@@ -146,6 +144,15 @@ def fetch_all_artist(artist, startFrom=0):
 def restore():
 	pass
 
+def clear_file(file):
+	file.seek(0)
+	file.truncate()
+
+def save_method_name(method_name):
+	path = os.path.dirname(os.path.realpath(__file__))
+	with open("%s/.restore_method" % path, "w") as restore_method_handle:
+		restore_method_handle.write(method_name)
+		restore_method_handle.close()
 def main():
 	parser = argparse.ArgumentParser();
 	group = parser.add_mutually_exclusive_group(required=True)
@@ -156,10 +163,16 @@ def main():
 
 	path = os.path.join(os.path.dirname(os.path.abspath(__file__)),"lyrics")
 
+	restore_argument = open("./.restore_args", "w+")
+	clear_file(restore_argument)
+
 	if not os.path.exists(path):
 		os.mkdir(path)
 
+	if arguments.restore is not False:
+		pass
 	if arguments.fetch_all_artist is not None:
+		restore_argument.write("fetch-all-artist\n%s" % (arguments.fetch_all_artist))
 		fetch_all_artist(" ".join(arguments.fetch_all_artist))
 		return
 	elif arguments.restore == True:
